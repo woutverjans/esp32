@@ -41,13 +41,14 @@ void app_main(void){
     int rising_edge = 0;
     while(1){
         prev_btn = curnt_btn;
-        vTaskDelay(pdMS_TO_TICKS(50)); //Voor te voorkomen dat hetzelfde getal 2 keer wordt ingegeven
+        vTaskDelay(pdMS_TO_TICKS(50)); //Tegen debouncen
         curnt_btn = gpio_get_level(BTN);
 
         if(curnt_btn == 1 && prev_btn == 0){rising_edge = 1;}
         else{rising_edge = 0;}
 
-        int input_val = adc1_get_raw(INPUT); //waarde van 0 tem 511
+        int raw_val = adc1_get_raw(INPUT); //waarde van 0 tem 511
+        int input_val = raw_val / 60 + 1; //Zet waarde om van 1 tem 9
         printf("Fase = %d en geselcteerd getal: %d\n",btn_fase, input_val);
 
         if(rising_edge == 1){
@@ -75,12 +76,12 @@ void app_main(void){
 
             //Begin open fase
             else if(btn_fase == 4){
-                if(input_val >= digits[0] - 10 && input_val <= digits[0] + 10){
+                if(input_val == digits[0]){
                     btn_fase = 5;
                 }
             }
             else if(btn_fase == 5){
-                if(input_val >= digits[1] - 10 && input_val <= digits[1] + 10){
+                if(input_val == digits[1]){
                     btn_fase = 6;
                 }
                 else{
@@ -88,7 +89,7 @@ void app_main(void){
                 }
             }
             else if(btn_fase == 6){
-                if(input_val >= digits[2] - 10 && input_val <= digits[2] + 10){
+                if(input_val == digits[2]){
                     btn_fase = 7;
                 }
                 else{
@@ -96,7 +97,7 @@ void app_main(void){
                 }
             }
             else if(btn_fase == 7){
-                if(input_val >= digits[3] - 10 && input_val <= digits[3] + 10){
+                if(input_val == digits[3]){
                     btn_fase = 0;
                     gpio_set_level(ACTUATOR, 1);
                     printf("SLOT OPENT SLOT OPENT SLOT OPENT SLOT OPENT SLOT OPENT SLOT OPENT SLOT OPENT SLOT OPENT\n");
