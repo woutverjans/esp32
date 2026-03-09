@@ -1,3 +1,9 @@
+/*
+TODO:
+- Delen van analoge waarde ipv ranges te gebruiken
+- Orderlijkere implementatie (switch case, hele array getallen in ene keer, ...)
+*/
+
 #include <stdio.h>
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -29,24 +35,32 @@ void app_main(void){
     int btn_fase = 0; //Gebruiken om bij te houden waar in het programma we zijn (code maken, welk getal en hetzelfde bij code ingeven)
     gpio_set_level(ACTUATOR, 0);
     int digits[4] = {0}; //Array voor de code, initialiseerd op 0000
+
+    int prev_btn = 0;
+    int curnt_btn = 0;
+    int rising_edge = 0;
     while(1){
-        vTaskDelay(pdMS_TO_TICKS(300)); //Voor te voorkomen dat hetzelfde getal 2 keer wordt ingegeven
+        prev_btn = curnt_btn;
+        vTaskDelay(pdMS_TO_TICKS(50)); //Voor te voorkomen dat hetzelfde getal 2 keer wordt ingegeven
+        curnt_btn = gpio_get_level(BTN);
+
+        if(curnt_btn == 1 && prev_btn == 0){rising_edge = 1;}
+        else{rising_edge = 0;}
+
         int input_val = adc1_get_raw(INPUT); //waarde van 0 tem 511
-        int knop = gpio_get_level(BTN);
         printf("Fase = %d en geselcteerd getal: %d\n",btn_fase, input_val);
 
-        if(knop == 1){
+        if(rising_edge == 1){
             //Begin ingeef fase
             if(btn_fase == 0){
                 digits[0] = input_val;
                 btn_fase = 1;
+                gpio_set_level(ACTUATOR, 0);
             }
 
             else if(btn_fase == 1){
                 digits[1] = input_val;
                 btn_fase = 2;
-                gpio_set_level(ACTUATOR, 0);
-
             }
 
             else if(btn_fase == 2){
