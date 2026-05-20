@@ -32,24 +32,45 @@ esp_err_t hs4013_read(hs4013_handle_t *sensor, hs4013_data_t *data){
     //starten leesfase, p18 datasheet (0xA7 commando sturen)
     uint8_t cmd[2] = {0xA7, 0x00};
 
-    esp_err_t ret = i2c_master_write(
+
+    esp_err_t ret = i2c_master_write_read_device(
+    sensor->i2c_port,
+    sensor->dev_addr,
+    cmd,
+    sizeof(cmd),
+    rx,
+    sizeof(rx),
+    pdMS_TO_TICKS(100)
+    );
+    /*esp_err_t ret = i2c_master_write(
         sensor->i2c_port,
         cmd,
         sizeof(cmd),
         pdMS_TO_TICKS(100)
-    );
+    );*/
 
     if (ret != ESP_OK){
         return ret;
     }
 
     //lees data (4 bytes)
+    i2c_master_write_read_device(
+    sensor->i2c_port,
+    sensor->dev_addr,
+    cmd,
+    sizeof(cmd),
+    rx,
+    sizeof(rx),
+    pdMS_TO_TICKS(100)
+    );
+
+    /*
     ret = i2c_master_read(
         sensor->i2c_port,
         rx,
         sizeof(rx),
         pdMS_TO_TICKS(100)
-    );
+    );*/
 
     if (ret != ESP_OK){
         return ret;
