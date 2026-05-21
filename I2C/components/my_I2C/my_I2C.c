@@ -10,7 +10,7 @@ static const char *TAG = "HS4013";
 //sensor initialiseren
 esp_err_t hs4013_init(hs4013_handle_t *sensor){
     sensor->i2c_port = I2C_NUM_0;
-    sensor->dev_addr = 0x44;
+    sensor->dev_addr = 0x54;
 
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
